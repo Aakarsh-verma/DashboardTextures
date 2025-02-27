@@ -1,3 +1,4 @@
 *.lock
 settings.json
 Pods/
+UserInterfaceState.xcuserstate
