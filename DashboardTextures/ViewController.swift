@@ -7,8 +7,12 @@
 
 import UIKit
 import AsyncDisplayKit
+import RxSwift
+import RxCocoa
 
 class ViewController: ASDKViewController<ASDisplayNode> {
+    private let viewModel = AnimeViewModel()
+    private let disposeBag = DisposeBag()
     
     struct State {
         var itemCount: Int
@@ -26,6 +30,7 @@ class ViewController: ASDKViewController<ASDisplayNode> {
     }
     
     fileprivate(set) var state: State = .empty
+    
     override init() {
         super.init(node: ASTableNode())
         tableNode.delegate = self
@@ -34,11 +39,22 @@ class ViewController: ASDKViewController<ASDisplayNode> {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("storyboards are incompatible with truth and beauty")
-      }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        setupBindings()
+        viewModel.fetchAnimeData()
+    }
+    
+    private func setupBindings() {
+        viewModel.animeList
+            .subscribe(onNext: { animeList in
+                for anime in animeList {
+                    print("Title: \(anime.title), Episodes: \(anime.episodes ?? 0), Score: \(anime.score ?? 0.0)")
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }
 
