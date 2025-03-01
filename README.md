@@ -11,7 +11,7 @@ Simple iOS Anime List Dashboard implemented using AsyncDisplayKit and RxSwift
 
 ## Previews
 
-Coming Soon
+<img src="Assets/home.png" alt="Home" width="200" height="450">
 
 ## Getting Started
 
