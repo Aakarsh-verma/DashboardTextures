@@ -18,7 +18,7 @@ class ViewController: ASDKViewController<ASDisplayNode> {
     struct State {
         var itemCount: Int
         var fetchingMore: Bool
-        static let empty = State(itemCount: 20, fetchingMore: false)
+        static let empty = State(itemCount: 0, fetchingMore: false)
     }
     
     enum Action {
@@ -37,6 +37,7 @@ class ViewController: ASDKViewController<ASDisplayNode> {
         tableNode.delegate = self
         tableNode.dataSource = self
         tableNode.backgroundColor = .navyBackGround
+        tableNode.view.separatorColor = .clear
         self.title = "Anime List"
     }
     
@@ -65,7 +66,7 @@ class ViewController: ASDKViewController<ASDisplayNode> {
 // MARK: - ASTableNode data source and delegate.
 extension ViewController: ASTableDataSource, ASTableDelegate {
     func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
-        let rowCount = self.tableNode(tableNode, numberOfRowsInSection: 0)
+        let rowCount = self.tableNode(tableNode, numberOfRowsInSection: dataSource.count)
         
         if state.fetchingMore && indexPath.row == rowCount - 1 {
             return {
@@ -75,7 +76,6 @@ extension ViewController: ASTableDataSource, ASTableDelegate {
             }
         }
         
-        if dataSource.count == 0 { return { return ASTextCellNode() } }
         let anime = self.dataSource[indexPath.row]
         return {
             return AnimeCellNode(anime: anime)

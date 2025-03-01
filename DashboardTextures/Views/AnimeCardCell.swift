@@ -21,6 +21,7 @@ class AnimeCellNode: ASCellNode {
     init(anime: AnimeData) {
         super.init()
         automaticallyManagesSubnodes = true
+        self.selectionStyle = .none
         backgroundColor = .navyBackGround
         setupNodes(with: anime)
     }
@@ -61,11 +62,15 @@ class AnimeCellNode: ASCellNode {
             string: anime.title ?? "NA",
             attributes: [.foregroundColor: UIColor.white, .font: UIFont.boldSystemFont(ofSize: 16)]
         )
+        titleNode.maximumNumberOfLines = 2
+        titleNode.truncationMode = .byTruncatingTail
+        titleNode.style.flexShrink = 1
+        titleNode.style.flexGrow = 1
     }
     
     private func setupRating(with anime: AnimeData) {
         ratingNode.attributedText = NSAttributedString(
-            string: "⭐ \(anime.rating ?? "0") (\(anime.members ?? 0) users)",
+            string: "\u{2606} \(anime.score ?? 0) (\(anime.members ?? 0) users)",
             attributes: [.foregroundColor: UIColor.lightGray, .font: UIFont.systemFont(ofSize: 12)]
         )
     }
@@ -116,6 +121,8 @@ class AnimeCellNode: ASCellNode {
             alignItems: .start,
             children: [statusBadgeWithBackground, seasonEpisodeNode, titleNode, ratingNode, rankingNode, genreStack]
         )
+        textStack.style.flexShrink = 1.0
+        textStack.style.flexGrow = 1.0
 
         let mainStack = ASStackLayoutSpec(
             direction: .horizontal,
