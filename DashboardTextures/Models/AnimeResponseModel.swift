@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - AnimeResponse
-struct AnimeResponse: Codable {
+struct AnimeResponseModel: Codable {
     var pagination: Pagination?
     var data: [Datum]?
 }

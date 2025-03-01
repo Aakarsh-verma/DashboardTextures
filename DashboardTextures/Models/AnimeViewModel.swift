@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 
 class AnimeViewModel {
-    let networkManager: NetworkServiceProtocol
+    private let networkManager: NetworkServiceProtocol
     private let disposeBag = DisposeBag()
     private(set) var animeList: PublishSubject<[Datum]> = PublishSubject()
     
@@ -22,9 +22,9 @@ class AnimeViewModel {
         networkManager.fetchData()
             .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
             .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] anime in
+            .subscribe { [weak self] (animeResponse: AnimeResponseModel) in
                 guard let self = self else { return }
-                self.animeList.onNext(anime)
+                self.animeList.onNext(animeResponse.data ?? [])
             } onError: { error in
                 NSLog(error.localizedDescription)
             }
