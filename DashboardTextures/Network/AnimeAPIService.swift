@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 import RxSwift
 
-let API_SERVICE = "https://api.jikan.moe/v4/seasons/2011/spring?sfw&limit=5"
+let API_SERVICE = "https://api.jikan.moe/v4/seasons/2014/spring?sfw&limit=10"
 
 protocol NetworkServiceProtocol {
     func fetchData<T: Codable>() -> Observable<T>
@@ -28,7 +28,7 @@ class AnimeAPIService: NSObject, NetworkServiceProtocol {
                 .responseDecodable(of: T.self) { response in
                     switch response.result {
                     case .success(let animeResponse):
-                        guard let finalResponse = animeResponse as? AnimeResponseModel else {
+                        guard animeResponse is AnimeResponseModel else {
                             observer.onError(NetworkError.typeCheckFailed)
                             return
                         }

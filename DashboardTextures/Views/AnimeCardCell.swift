@@ -17,77 +17,106 @@ class AnimeCellNode: ASCellNode {
     private let ratingNode = ASTextNode()
     private let rankingNode = ASTextNode()
     private let genreStack = ASStackLayoutSpec()
-    
+
     init(anime: AnimeData) {
         super.init()
         automaticallyManagesSubnodes = true
-        self.backgroundColor = .navyBackGround
-        setupNodes(anime: anime)
+        backgroundColor = .navyBackGround
+        setupNodes(with: anime)
     }
     
-    private func setupNodes(anime: AnimeData) {
-        // Cover Image
+    private func setupNodes(with anime: AnimeData) {
+        setupCoverImage(with: anime)
+        setupStatusBadge(with: anime)
+        setupSeasonEpisode(with: anime)
+        setupTitle(with: anime)
+        setupRating(with: anime)
+        setupRanking(with: anime)
+        setupGenreTags(with: anime)
+    }
+    
+    private func setupCoverImage(with anime: AnimeData) {
         coverImageNode.url = URL(string: anime.images?["jpg"]?.imageURL ?? "")
         coverImageNode.style.preferredSize = CGSize(width: 100, height: 140)
         coverImageNode.cornerRadius = 8
         coverImageNode.clipsToBounds = true
-        
-        // Status Badge
+    }
+    
+    private func setupStatusBadge(with anime: AnimeData) {
         statusBadgeNode.attributedText = NSAttributedString(
             string: anime.status ?? "NA",
             attributes: [.foregroundColor: UIColor.white, .font: UIFont.boldSystemFont(ofSize: 12)]
         )
-        statusBadgeNode.backgroundColor = UIColor.darkGray
-        statusBadgeNode.cornerRadius = 4
-        statusBadgeNode.style.spacingAfter = 5
-        
-        // Season and Episode Count
+    }
+    
+    private func setupSeasonEpisode(with anime: AnimeData) {
         seasonEpisodeNode.attributedText = NSAttributedString(
-            string: "\(anime.season ?? "NA") • \(anime.episodes ?? 0) episodes",
+            string: "\(anime.season?.uppercased() ?? "NA") • \(anime.episodes ?? 0) episodes",
             attributes: [.foregroundColor: UIColor.lightGray, .font: UIFont.systemFont(ofSize: 12)]
         )
-        
-        // Anime Title
+    }
+    
+    private func setupTitle(with anime: AnimeData) {
         titleNode.attributedText = NSAttributedString(
             string: anime.title ?? "NA",
             attributes: [.foregroundColor: UIColor.white, .font: UIFont.boldSystemFont(ofSize: 16)]
         )
-        
-        // Rating
+    }
+    
+    private func setupRating(with anime: AnimeData) {
         ratingNode.attributedText = NSAttributedString(
             string: "⭐ \(anime.rating ?? "0") (\(anime.members ?? 0) users)",
             attributes: [.foregroundColor: UIColor.lightGray, .font: UIFont.systemFont(ofSize: 12)]
         )
-        
-        // Ranking
+    }
+    
+    private func setupRanking(with anime: AnimeData) {
         rankingNode.attributedText = NSAttributedString(
             string: "#\(anime.popularity ?? -1) Ranking",
             attributes: [.foregroundColor: UIColor.lightGray, .font: UIFont.systemFont(ofSize: 12)]
         )
-        
-        // Genre Tags
+    }
+    
+    private func setupGenreTags(with anime: AnimeData) {
+        genreStack.direction = .horizontal
+        genreStack.spacing = 5
+        genreStack.justifyContent = .start
+        genreStack.alignItems = .center
+
         for genre in (anime.genres ?? []) {
             let genreNode = ASTextNode()
             genreNode.attributedText = NSAttributedString(
                 string: genre.name ?? "",
                 attributes: [.foregroundColor: UIColor.white, .font: UIFont.systemFont(ofSize: 12)]
             )
-            genreNode.backgroundColor = UIColor.darkGray
-            genreNode.cornerRadius = 4
-//            genreNode.style.padding = 5
-            genreStack.children?.append(genreNode)
+            genreStack.children?.append(createPaddedBackgroundNode(for: genreNode, withColor: .darkGray, value: 2))
         }
     }
     
+    private func createPaddedBackgroundNode(for node: ASDisplayNode, withColor color: UIColor, value: CGFloat = 2) -> ASBackgroundLayoutSpec {
+        let paddedNode = ASInsetLayoutSpec(
+            insets: UIEdgeInsets(top: value, left: value*2, bottom: value, right: value*2),
+            child: node
+        )
+
+        let backgroundNode = ASDisplayNode()
+        backgroundNode.backgroundColor = color
+        backgroundNode.cornerRadius = 4
+
+        return ASBackgroundLayoutSpec(child: paddedNode, background: backgroundNode)
+    }
+
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+        let statusBadgeWithBackground = createPaddedBackgroundNode(for: statusBadgeNode, withColor: .darkGray, value: 4)
+
         let textStack = ASStackLayoutSpec(
             direction: .vertical,
             spacing: 5,
             justifyContent: .start,
             alignItems: .start,
-            children: [statusBadgeNode, seasonEpisodeNode, titleNode, ratingNode, rankingNode, genreStack]
+            children: [statusBadgeWithBackground, seasonEpisodeNode, titleNode, ratingNode, rankingNode, genreStack]
         )
-        
+
         let mainStack = ASStackLayoutSpec(
             direction: .horizontal,
             spacing: 10,
@@ -95,8 +124,7 @@ class AnimeCellNode: ASCellNode {
             alignItems: .center,
             children: [coverImageNode, textStack]
         )
-        
+
         return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), child: mainStack)
     }
 }
-
