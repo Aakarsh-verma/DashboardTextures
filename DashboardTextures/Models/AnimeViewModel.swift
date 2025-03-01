@@ -12,7 +12,7 @@ import RxCocoa
 class AnimeViewModel {
     private let networkManager: NetworkServiceProtocol
     private let disposeBag = DisposeBag()
-    private(set) var animeList: PublishSubject<[Datum]> = PublishSubject()
+    private(set) var animeList: PublishSubject<[AnimeData]> = PublishSubject()
     
     init(networkManager: NetworkServiceProtocol = AnimeAPIService()) {
         self.networkManager = networkManager

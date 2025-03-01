@@ -10,11 +10,11 @@ import Foundation
 // MARK: - AnimeResponse
 struct AnimeResponseModel: Codable {
     var pagination: Pagination?
-    var data: [Datum]?
+    var data: [AnimeData]?
 }
 
-// MARK: - Datum
-struct Datum: Codable {
+// MARK: - AnimeData
+struct AnimeData: Codable {
     var malID: Int?
     var url: String?
     var images: [String: Image]?

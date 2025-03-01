@@ -13,6 +13,7 @@ import RxCocoa
 class ViewController: ASDKViewController<ASDisplayNode> {
     private let viewModel = AnimeViewModel()
     private let disposeBag = DisposeBag()
+    private var dataSource: [AnimeData] = []
     
     struct State {
         var itemCount: Int
@@ -35,6 +36,8 @@ class ViewController: ASDKViewController<ASDisplayNode> {
         super.init(node: ASTableNode())
         tableNode.delegate = self
         tableNode.dataSource = self
+        tableNode.backgroundColor = .navyBackGround
+        self.title = "Anime List"
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -49,10 +52,11 @@ class ViewController: ASDKViewController<ASDisplayNode> {
     
     private func setupBindings() {
         viewModel.animeList
-            .subscribe(onNext: { animeList in
-                for anime in animeList {
-                    print("Title: \(anime.title), Episodes: \(anime.episodes ?? 0), Score: \(anime.score ?? 0.0)")
-                }
+            .subscribe(onNext: { [weak self] animeList in
+                guard let self else { return }
+                self.dataSource = animeList
+                self.state = State(itemCount: animeList.count, fetchingMore: false)
+                self.tableNode.reloadData()
             })
             .disposed(by: disposeBag)
     }
@@ -73,10 +77,10 @@ extension ViewController: ASTableDataSource, ASTableDelegate {
             }
         }
         
+        if dataSource.count == 0 { return { return ASTextCellNode() } }
+        let anime = self.dataSource[indexPath.row]
         return {
-            let node = ASTextCellNode()
-            node.text = String(format: "[%ld.%ld] says hello!", indexPath.section, indexPath.row)
-            return node
+            return AnimeCellNode(anime: anime)
         }
     }
     
@@ -101,13 +105,13 @@ extension ViewController: ASTableDataSource, ASTableDelegate {
             self.renderDiff(oldState)
         }
         
-        ViewController.fetchDataWithCompletion { resultCount in
-            let action = Action.endBatchFetch(resultCount: resultCount)
-            let oldState = self.state
-            self.state = ViewController.handleAction(action, fromState: oldState)
-            self.renderDiff(oldState)
-            context.completeBatchFetching(true)
-        }
+//        ViewController.fetchDataWithCompletion { resultCount in
+//            let action = Action.endBatchFetch(resultCount: resultCount)
+//            let oldState = self.state
+//            self.state = ViewController.handleAction(action, fromState: oldState)
+//            self.renderDiff(oldState)
+//            context.completeBatchFetching(true)
+//        }
     }
     
     fileprivate func renderDiff(_ oldState: State) {
