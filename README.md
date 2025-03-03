@@ -1,6 +1,6 @@
 # Dashboard Textures
 
-Simple iOS Anime List Dashboard implemented using AsyncDisplayKit and RxSwift
+Simple iOS Anime List Dashboard implemented using AsyncDisplayKit and RxSwift, taking advantage of asynchronous UI plotting(rendering region values in background) and reactive programming
 
 ## Table of Contents
 
